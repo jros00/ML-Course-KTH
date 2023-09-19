@@ -1,0 +1,6 @@
+*.pyc
+*draw
+*.Ds_Store
+*__pycache__
+*.__pycache__
+*test

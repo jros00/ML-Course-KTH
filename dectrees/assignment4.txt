@@ -1,0 +1,62 @@
+Assignment 4: Understanding Information Gain and Entropy in Decision Tree Splitting
+
+Entropy of Subsets S_k When Information Gain is Maximized
+
+    When Information Gain is maximized, the entropy of the resulting subsets S_k is minimized. 
+    In other words, the subsets are as homogeneous as possible with respect to the target variable.
+    This means that each subset is dominated by a single class label, making it easier to make 
+    accurate predictions.
+
+    Entropy Minimized: 
+        Entropy is a measure of disorder or randomness. 
+        Low entropy means there's less chaos and more uniformity. 
+        So, when the entropy of subsets is minimized, it means that 
+        the items within each subset are largely similar to each other, 
+        at least in terms of the target variable you care about 
+        (e.g., whether they will play tennis or not).
+
+    Homogeneous Subsets, dominated by a single class label: 
+        When subsets are homogeneous with respect to the target variable, 
+        it means that each subset mostly contains the same type of outcome. 
+        For example, in one subset, most of the instances might be "Yes, will play tennis," 
+        and in another subset, most might be "No, won't play tennis."
+
+    Easier to Make Accurate Predictions: 
+        When each subset is mostly made up of instances with the same target label, 
+        it becomes straightforward to predict the target variable for new instances 
+        that would fall into that subset. 
+        You would simply predict the dominant label for that subset.
+
+
+Motivation for Using Information Gain as a Heuristic
+
+1. Reduction in Entropy:  
+
+    Information Gain is directly related to the reduction in entropy after a split. 
+    A higher Information Gain means that the split has resulted in subsets where the 
+    outcomes are more certain (low entropy), which in turn means that less uncertainty 
+    remains about the classification of instances in each subset. 
+    The attribute that results in the largest Information Gain will produce subsets 
+    that are most useful for predicting the target variable.
+
+    From KTH Lecture:
+
+        The greedy (and efficient) approach to choose a "question" is to 
+        choose the attribute that tells us the most about the answer.
+        Information gain reveals which attribute reduces the entropy (a
+        measure of uncertainty) in the dataset the most.
+        It can thus be argued that information gain helps us choose an
+        attribute that tells us the most about the answer - by choosing
+        an attribute that reduces the entropy the most.
+
+    High entropy implies a lot of randomness or uncertainty in the data. 
+    By choosing splits that maximize Information Gain (or equivalently, minimize entropy), 
+    we are selecting attributes that best separate the data into classes, 
+    thereby reducing randomness and making it easier to draw conclusions or make 
+    predictions based on these attributes.
+
+By using Information Gain as a heuristic, we're essentially striving to quickly 
+find the most useful attributes for classification, thereby making the decision tree 
+both more accurate and simpler. 
+
+This simplification often also leads to a more interpretable model.

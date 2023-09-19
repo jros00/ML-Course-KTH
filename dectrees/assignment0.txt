@@ -1,0 +1,7 @@
+MONK-1: Difficult due to comparision between a1 and a2
+MONK-2: Difficult due to simultaneous comparison between Attributes
+MONK-3: Difficult due to multiple conditions satisfied at once (+ Noise)
+
+MONK-2 should be the most difficult, since it has the most simultaneous
+comparison between Attributes, which is something that typically
+requires more than a binary split

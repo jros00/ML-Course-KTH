@@ -1,0 +1,35 @@
+Assignment 2: Explanation and Examples of Entropy
+
+Entropy Formula
+
+    Entropy measures the randomness or uncertainty in a distribution. It's calculated as:
+
+    `H = - Sum(i=1 to n) [ p(x_i) * log(p(x_i)) ]`
+
+Uniform Distribution
+    In a uniform distribution, all outcomes are equally likely, leading to maximum entropy. 
+    For a fair six-sided die with each face having a 1/6 chance, the entropy is:
+
+    `H = log(6)`  
+    Result: `H = 2.59`
+
+Non-Uniform Distribution
+    In a non-uniform distribution, outcomes have different probabilities, 
+    resulting in lower entropy. For a biased six-sided die where '6' has a 1/2 chance 
+    and the other faces have a 1/10 chance each, the entropy is:
+
+    `H = - ( 5 * (1/10) * log(1/10) + (1/2) * log(1/2) )`  
+    Result: `H = 1.61`
+
+High and Low Entropy Examples
+
+    - High Entropy: 
+    A uniform distribution over 100 outcomes.  
+    `H = log(100)`
+
+    - Low Entropy: 
+    One outcome with a 0.99 chance and 99 outcomes with a 1/9900 chance each.  
+    `H` will be much less than `log(100)`
+
+In summary, a uniform distribution has the highest entropy for a given number of outcomes, 
+while non-uniform distributions generally have lower entropy.
