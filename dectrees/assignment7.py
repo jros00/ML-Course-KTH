@@ -47,10 +47,10 @@ def compute_pruned_validation_statistics(datasets: dict, fractions: list, n: int
                 initial_tree = dtree.buildTree(train, attributes)
                 
                 # Prune the tree
-                pruned_tree = prune_tree(initial_tree, val)
+                # pruned_tree = prune_tree(initial_tree, val)
                 
                 # Compute accuracy
-                acc = dtree.check(pruned_tree, val)
+                acc = dtree.check(initial_tree, val)
                 accuracies.append(acc)
 
             mean_acc = np.mean(accuracies)
@@ -96,7 +96,7 @@ def main():
     plt.ylabel('Mean Accuracy', fontsize=14)
 
     # Add a descriptive title with larger font size
-    plt.title('Pruned Tree Validation', fontsize=16)
+    plt.title('Non-Pruned Tree Validation', fontsize=16)
 
     # Add grid for better readability of plotted points
     plt.grid(True, linestyle='--', linewidth=0.5, color='grey')
