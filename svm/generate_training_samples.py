@@ -60,7 +60,7 @@ def plot(class_a: np.ndarray, class_b: np.ndarray):
 
     plt.legend()
     plt.axis('equal') # force same scale and axises
-    plt.savefig('svm/figures/svmplot.pdf') # save the copy
+    plt.savefig('svm/figures/svmplot.png') # save the copy
     plt.show()
 
 
