@@ -36,7 +36,7 @@ class SupportVectorMachine:
         return np.dot(x1, x2)
 
 
-    def polynomial_kernel(self, x1, x2, degree=2):
+    def polynomial_kernel(self, x1, x2, degree=3):
         """
         ### Compute the polynomial kernel between two data points.
         Allows for curved decision boundaries.
@@ -49,13 +49,13 @@ class SupportVectorMachine:
         return (np.dot(x1, x2) + 1) ** degree
 
 
-    def rbf_kernel(self, x1, x2, sigma=2.0):
+    def rbf_kernel(self, x1, x2, sigma=3.0):
         """
         ### Compute the RBF kernel (Gaussian kernel) between two data points.
         Uses the euclidian distance between two datapoints. Often very good boundaries.
         #### Parameters:
         - x1, x2: Numpy Arrays representing data points.
-        - gamma: Parameter controlling the kernel's width and the smothness of the boundary (default=1.0)
+        - sigma: Parameter controlling the kernel's width and the smothness of the boundary (default=1.0)
         #### Returns:
         - The scalar product-like similarity measure.
         """
@@ -258,15 +258,6 @@ class SupportVectorMachine:
                 loc='upper right')
         plt.axis('equal') # force same scale and axises
         plt.savefig(f'svm/figures/svm-boundary-{self.kernel}-kernel.png') # save the copy
-        plt.show()
-
-    def plot_boundary(self):
-
-        plt.figure(figsize=(10, 6))
-        xgrid = np.linspace(-5, 5)
-        ygrid = np.linspace(-4, 4)
-        grid = np.array([[self.indicator([x, y]) for x in xgrid] for y in ygrid])
-        plt.contour(xgrid, ygrid, grid, (-1.0, 0.0, 1.0), colors=('red', 'black', 'blue'), linewidths=(1, 3, 1))
         plt.show()
 
 
