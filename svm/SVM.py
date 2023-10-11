@@ -5,6 +5,13 @@ from generate_training_samples import generate_training_data
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
+
+"""
+- Bias: Error due to a model's oversimplification, leading to underfitting.
+
+- Variance: Error due to a model's sensitivity to noise or over-complexity, leading to overfitting.
+"""
+
 class SupportVectorMachine:
     """
     ### A class for a Support Vector Machine.
@@ -12,7 +19,15 @@ class SupportVectorMachine:
     - feature_vectors: Nested NumPy Arrays with the features of a point.
     - label_vector: A NumPy Array of the labels of each point, in the same order.
     - kernel: The chosen kernel function. 'linear' | 'polynomial' | 'rbf'
-    - C: the regularization parameter
+    - C: the regularization parameter.
+        Small C (Loose Constraint):
+            When C is a small positive value (approaching zero), the SVM optimization problem allows for a wider margin. 
+            This is because the optimization process focuses more on maximizing the margin and is less concerned with the classification errors. 
+            In this case, the SVM might tolerate some misclassification in order to achieve a larger margin.
+        Large C (Tight Constraint):
+            When C is a large positive value, the optimization problem enforces a tighter constraint on the Lagrange multipliers. 
+            This means that the SVM prioritizes correct classification of data points, and the margin may be smaller. 
+            In other words, a larger C leads to a smaller margin but a stronger emphasis on correctly classifying the training data.
     """
     def __init__(self, feature_vectors, label_vector, kernel='linear', C=1.0) -> None:
         self.feature_vectors: np.ndarray[np.ndarray] = feature_vectors
@@ -24,7 +39,13 @@ class SupportVectorMachine:
         self.non_zeroes = None
 
 
-    def linear_kernel(self, x1, x2):
+    ### NOTE
+    ### The kernel “trick” is that kernel methods represent the data only through a set of pairwise similarity 
+    # comparisons between the original data observations x (with the original coordinates in the lower dimensional space), 
+    # instead of explicitly applying the transformations ϕ(x) and representing the data by these transformed coordinates 
+    # in the higher dimensional feature space.
+
+    def linear_kernel(self, x1: np.ndarray, x2: np.ndarray):
         """
         ### Compute the linear kernel between two data points. 
         #### Parameters:
@@ -33,26 +54,52 @@ class SupportVectorMachine:
         - Scalar product. This results in a linear separation.
         - The scalar product-like similarity measure.
         """
-        return np.dot(x1, x2)
+        return np.dot(x1.T, x2)
 
 
-    def polynomial_kernel(self, x1, x2, degree=3):
+    def polynomial_kernel(self, x1: np.ndarray, x2: np.ndarray, degree=4):
         """
         ### Compute the polynomial kernel between two data points.
+        Maps the data into a higher dimensional space by the degree variable.
         Allows for curved decision boundaries.
+
+        Lower-degree polynomials have a lower model complexity, which tends to underfit the data (high bias).
+        Higher-degree polynomials have a higher model complexity, which can capture complex patterns but may overfit the data (high variance).
+
         #### Parameters:
         - x1, x2: Numpy Arrays representing data points.
-        - degree: Degree of the polynomial kernel (default=2). degree = 2 will give quadratic shapes.
+        - degree: Degree of the polynomial kernel (default=2). 
+        #### degree = 1 will give a linear boundary, while degree=2 will give quadratic shapes.
         #### Returns:
         - The scalar product-like similarity measure.
         """
-        return (np.dot(x1, x2) + 1) ** degree
+        return (np.dot(x1.T, x2) + 1) ** degree
 
 
-    def rbf_kernel(self, x1, x2, sigma=3.0):
+    def rbf_kernel(self, x1, x2, sigma=1):
         """
         ### Compute the RBF kernel (Gaussian kernel) between two data points.
+
         Uses the euclidian distance between two datapoints. Often very good boundaries.
+        "sigma" controls the shape of the RBF kernel. 
+            - A smaller "sigma" makes the kernel narrower, 
+            - A larger "sigma" makes it wider.
+            - When "sigma" is small, the kernel assigns high similarity (large kernel values) 
+            to data points that are close.
+            - When "sigma" is large, the kernel assigns high similarity to data points 
+            that are further apart.
+
+        When the kernel is narrower (smaller "sigma"), the decision boundary tends to be more 
+        flexible and can capture local patterns, including smaller clusters. 
+        This flexibility can lead to a more complex, wiggly boundary that fits the training data closely.
+
+        Smaller "sigma" (narrow kernel) increases model variance, making the decision boundary 
+        more sensitive to the training data. This can lead to overfitting.
+        
+        Larger "sigma" (wide kernel) reduces model variance, making the decision boundary 
+        smoother and more robust. This can reduce the risk of overfitting but might lead to 
+        underfitting if the data is complex.
+
         #### Parameters:
         - x1, x2: Numpy Arrays representing data points.
         - sigma: Parameter controlling the kernel's width and the smothness of the boundary (default=1.0)
@@ -70,6 +117,9 @@ class SupportVectorMachine:
     def create_kernel_matrix(self) -> np.ndarray:
         """
         ### Compute the kernel matrix, K
+        #### Inner Products: The kernel matrix stores the pairwise inner products between data points. 
+        #### Each element of the matrix corresponds to the inner product (dot product) between two feature vectors. 
+        #### These inner products represent the similarity or distance between data points, allowing the SVM to measure the relationships between the data.
         #### Returns: 
             - the kernel matrix (N x N)
         """
@@ -91,6 +141,10 @@ class SupportVectorMachine:
     def objective(self, alpha: np.ndarray):
         """
         ### Compute the objective function for the dual SVM problem.
+        #### A mathematical expression that the SVM seeks to optimize during the training process. 
+        #### The primary goal of the objective function is to find the optimal decision boundary (hyperplane) 
+        #### that maximizes the margin between different classes of data points while minimizing classification errors.
+        #### The dual form of the problem is to find the values alpha_i which minimizes the equation
         #### Returns:
         - The value of the objective function.
         """
@@ -99,7 +153,7 @@ class SupportVectorMachine:
         weighted_kernel_matrix = np.outer(alpha * self.label_vector, alpha * self.label_vector) * self.kernel_matrix
 
         # Calculate the objective value
-        obj_value = np.sum(weighted_kernel_matrix) - np.sum(alpha)
+        obj_value = (0.5 * np.sum(weighted_kernel_matrix)) - np.sum(alpha)
 
         return obj_value
 
@@ -142,7 +196,20 @@ class SupportVectorMachine:
         
 
     def find_support_vectors(self):
-        """ ### Extract support-vectors """
+        """ 
+            ### Extract support-vectors 
+            When the alpha values for data points are non-zero, it means that they lie exactly on the margin or very close to it. 
+
+            The margin is defined as the space between the two parallel hyperplanes that are closest to the 
+            decision boundary and still correctly classify all training data.
+            The width of the margin is crucial in SVMs. A larger margin indicates a more confident separation of classes, 
+            while a smaller margin may indicate that the separation is less confident.
+
+            These data points effectively "support" the decision boundary by helping determine its position.
+            The location of the decision boundary is given by the weights (alpha) and the bias (b)
+            The margin is a region around the decision boundary that is free from data points. 
+           
+        """
         limit = 0.00001
         self.non_zeroes = [
             {
@@ -155,7 +222,10 @@ class SupportVectorMachine:
 
     def calculate_bias(self) -> None:
         """
-        ### Calculate the threshold value 'b' using the support vectors.
+        ### Calculate the threshold value 'b' using the support vectors in order to define the location of the decision boundary.
+        #### The bias term, "b," helps set the threshold for the decision boundary. 
+        #### It determines the distance of the decision boundary from the origin.
+
         #### The bias term is calculated using the support vectors like so:
         - b = ∑ alpha[i] * target[i] * kernel_matrix[[support_vector[i], x[i]]] - target[support_vector]
         """
@@ -188,6 +258,20 @@ class SupportVectorMachine:
     def indicator(self, point: np.ndarray):
         """
         ### Use this function classify a new point.
+
+        #### Description:
+            The decision value, often denoted as "f(x)" or "f(point)" in mathematical representations, 
+            is calculated as the weighted sum of kernel values between the new point and the support vectors:
+            - decision_value = Σ [alpha_i * target_i * K(point, feature_i)] - b
+
+            The decision value represents the point's position relative to the decision boundary:
+                - If decision_value is greater than or equal to 0, it means the point is on or 
+                    beyond the decision boundary's positive side. 
+                    In this case, the point is classified as the positive class (usually +1).
+
+                - If decision_value is less than 0, it means the point is on the negative side of the 
+                    decision boundary, and it is classified as the negative class (usually -1).
+
         #### Parameters:
         - point: NumPy feature array [f1, f2]
         #### Returns:
